@@ -1,0 +1,33 @@
+# Experiment to train on n and evaluate on n realizations. Otherwise, this experiment is the same as 
+#  m_member_subsets_with_m50_eval_on_all_spcmp which trains on n and evaluates on the average of 50 
+#  realizations. One can see for example in docs/figures/mpi-esm1-2-lr/pr/m_member_subsets_with_m50_replace_False/
+#  Y_rmse_spatial.png that train and evaluating on n slightly improves the RMSE for cnn-lstm at low n,
+#  because train and test set look more similar. 
+
+device: 'cuda:0' # 'cpu'
+seed: 42
+
+repo_root: '/home/lutjens/climate-emulator/'
+data_root: '/d0/lutjens/'
+data_path: '/d0/lutjens/raw/CMIP6/MPI-ESM1-2-LR/' # raw data downloaded from CMIPX
+data_path_interim: '/d0/lutjens/interim/CMIP6/MPI-ESM1-2-LR/' # interim data, such as, statistical summaries
+data_path_climatebench: '/home/lutjens/climate-emulator-tutorial/data/raw/climatebench/' # climatebench data
+path_experiment: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_replace_False/' # root path to experiment
+path_m_members_subsets_csv: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_replace_False/config/m_member_subsets_with_m50_replace_False.csv'
+wandb_project_name: 'emcli-mpi-esm1-2-lr-m_member_subsets_with_m50_replace_False'
+
+slider: 10 # years moving temporal window 
+loss_function: 'weighted_mse' # 'mse'
+optimizer: 'adam' # 'rmsprop'
+learning_rate: 0.001
+weight_decay: 0.1
+batch_size: 16
+epochs: 100
+early_stopping_patience: 20
+
+member_mode: 'ascending'
+max_number_of_members_per_subset: 50
+skip_subsets: 1
+replace: False
+equal_number_of_members_in_each_subset: null
+number_of_subsets: null

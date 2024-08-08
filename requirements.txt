@@ -1,0 +1,34 @@
+# status 06/2024: tested on Windows 10; WSL 2.0; Ubuntu 18.04 with version in comments.
+numpy # 1.26.4
+matplotlib # 3.9.0
+tqdm # 4.66.4
+cartopy # 0.23.0
+xarray # 2024.6.0
+notebook # 7.2.1
+netcdf4 # 1.7.1.post1
+dask # 2024.6.2
+bottleneck # 1.4.0
+torch # 2.3.1; deep learning library. Will install CUDA if GPU is available. Might take a while >1GB packages. Need torch>=2.1.0, <2.3.0 for keras to work.
+torchvision # 0.18.1
+ipywidgets # 8.1.3
+# hvplot # uncomment to create interactive plots nicely integrated with xarray
+# jupyter_bokeh # uncomment to make hvplot run
+# geoviews # uncomment to create geospatial plots in hvplot
+scikit-learn # 1.5.0; for linear regression model and some data preprocessing
+regionmask # 0.12.01; for plotting regional boundaries
+streamlit # 1.36.0; for webdemo
+xskillscore # 0.0.26; for error metrics on xarrays
+nc-time-axis # 1.4.1; to plot monthly xarray data easily
+line_profiler # 4.1.3; to prfile runtimes line by line
+# climateset downloader
+xmip # 0.7.2 
+esgf-pyclient # 0.3.1
+h5netcdf # 1.3.0
+# zipfile 
+flox # 0.9.8; for fast xr.Dataset.groupby() operations
+keras # 3.4.0; for training cnn-lstm
+wandb # 0.17.3; for logging experiments
+huggingface_hub # 0.23.4; for downloading dataset
+tensorflow # 2.16.1; Some components related Keras 3.0 with torch backend still rely on tf (here wandblogger and Dataset() class). Todo: remove this requirement after wandb and keras update.
+
+

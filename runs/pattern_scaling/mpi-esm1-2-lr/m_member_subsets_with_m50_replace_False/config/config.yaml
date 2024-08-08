@@ -1,0 +1,21 @@
+# This cfg is part of an experiment on evaluating on n vs 50 realizations. See runs/cnn_lstm/mpi-esm1-2-lr
+#  /m_member_subsets_with_m50_replace_False/config/config.yaml for full description.
+
+device: 'cpu' # 'cpu'
+seed: 42
+
+repo_root: '/home/lutjens/climate-emulator/'
+data_root: '/d3/lutjens/bc3/data/'
+data_path: '/d3/lutjens/bc3/data/raw/CMIP6/MPI-ESM1-2-LR/' # raw data downloaded from CMIPX
+data_path_interim: '/d3/lutjens/bc3/data/interim/CMIP6/MPI-ESM1-2-LR/' # interim data, such as, statistical summaries
+data_path_climatebench: '/home/lutjens/climate-emulator-tutorial/data/raw/climatebench/' # climatebench data
+path_experiment: '/home/lutjens/climate-emulator/runs/pattern_scaling/mpi-esm1-2-lr/m_member_subsets_with_m50_replace_False/' # root path to experiment
+path_m_members_subsets_csv: '/home/lutjens/climate-emulator/runs/pattern_scaling/mpi-esm1-2-lr/m_member_subsets_with_m50_replace_False/config/m_member_subsets_with_m50_replace_False.csv'
+# wandb_project_name: 'emcli-mpi-esm1-2-lr-m_member_subsets_with_m50_replace_False'
+
+member_mode: 'ascending'
+max_number_of_members_per_subset: 50
+skip_subsets: 1
+replace: False
+equal_number_of_members_in_each_subset: null
+number_of_subsets: null

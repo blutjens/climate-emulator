@@ -1,0 +1,41 @@
+# This cfg is part of an experiment on evaluating on n vs 50 realizations. See runs/cnn_lstm/mpi-esm1-2-lr
+#  /m_member_subsets_with_m50_replace_False/config/config.yaml for full description.
+# This cfg is also part of an ablation experiment of adjusting the hyperparams to be the same as 
+#  dwp. See /d3/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp/config/config.yaml for details
+
+device: 'cuda' # 'cpu'
+seed: 42
+use_deterministic_algorithms: True
+warn_only: True
+
+repo_root: '/home/lutjens/climate-emulator/'
+data_root: '/d3/lutjens/bc3/data/'
+data_path: '/d3/lutjens/bc3/data/raw/CMIP6/MPI-ESM1-2-LR/' # raw data downloaded from CMIPX
+data_path_interim: '/d3/lutjens/bc3/data/interim/CMIP6/MPI-ESM1-2-LR/' # interim data, such as, statistical summaries
+data_path_climatebench: '/home/lutjens/climate-emulator-tutorial/data/raw/climatebench/' # climatebench data
+path_experiment: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp/' # root path to experiment
+path_wandb: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp/' # Store wandb logs
+path_checkpoints: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp/checkpoints' # Store model checkpoints
+path_sweep: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp/sweep' # If train.py is run with --sweep, the wandb and checkpoints will be stored in subfolders of this directory
+path_sweep_cfg: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp/config/sweep.yaml' # Path to hyperparameter sweep config yaml. Only used if args.sweep == True
+path_eval: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp/eval_during_training' # Stores predictions and evaluation diagnostics during training; path is overwritten if sweep=True
+wandb_project_name: 'emcli-mpi-esm1-2-lr-m_member_subsets_with_m50_eval_on_all_spcmp'
+path_m_members_subsets_csv: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp/config/m_member_subsets_with_m50_eval_on_all_spcmp.csv'
+
+slider: 10 # years moving temporal window 
+loss_function: 'weighted_mse' # 'mse'
+optimizer: 'adam' # 'rmsprop'
+learning_rate: 0.001
+weight_decay: 0.1
+batch_size: 16
+epochs: 100
+early_stopping_patience: 20
+
+eval_on_all_member_mean: True # If True, evaluate on the mean of all members. If False, evaluate on the mean of the selection m_member_subset
+member_mode: 'ascending'
+max_number_of_members_per_subset: 50
+skip_subsets: 1
+replace: False
+equal_number_of_members_in_each_subset: null
+number_of_subsets: null
+idx_member_subset: null # Idx of member subset (with m members); if given only this subset is used for training

@@ -1,0 +1,28 @@
+# This cfg is the default configuration called with python emcli2/models/cnn_lstm/train.py and can be
+#  used to test if the cnn-lstm training works
+
+device: 'cuda:0' # Options: 'cpu', 'cuda:0'
+seed: 42
+use_deterministic_algorithms: True
+warn_only: True
+open_data_parallel: False
+
+# Paths
+repo_root: '/mnt/c/Users/Bjoern/code/climate-emulator-presubmission-tst/' # path to github cloned repository
+data_root: '/mnt/c/Users/Bjoern/data/climate-emulator-presubmission-tst/data/' # path to data directory: $DATA_DIR/data/
+data_path: '/mnt/c/Users/Bjoern/data/climate-emulator-presubmission-tst/data/raw/CMIP6/MPI-ESM1-2-LR/' # raw data downloaded from CMIPX (includes piControl)
+data_path_interim: '/mnt/c/Users/Bjoern/data/climate-emulator-presubmission-tst/data/interim/CMIP6/MPI-ESM1-2-LR/' # interim data, such as, statistical summaries
+data_path_climatebench: '/mnt/c/Users/Bjoern/data/climate-emulator-presubmission-tst/data/raw/climatebench/' # climatebench data
+path_experiment: '/mnt/c/Users/Bjoern/code/climate-emulator-presubmission-tst/runs/cnn_lstm/mpi-esm1-2-lr/default/' # root path to experiment
+path_m_members_subsets_csv: '/mnt/c/Users/Bjoern/code/climate-emulator-presubmission-tst/runs/cnn_lstm/mpi-esm1-2-lr/default/config/m_member_subsets.csv' # store subset information
+wandb_project_name: 'emcli-mpi-esm1-2-lr-default-delete'
+
+# CNN-LSTM hyperparameters
+slider: 10 # years moving temporal window 
+loss_function: 'mse' # Options: 'mse', 'weighted_mse'
+optimizer: 'rmsprop' # Options: 'rmsprop', 'adam'
+learning_rate: 0.001
+weight_decay: null
+batch_size: 16
+epochs: 2
+early_stopping_patience: 20

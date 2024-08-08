@@ -1,0 +1,43 @@
+# Config for internal variability experiment in JAMES24. This experiment generates 8400 runs per variable 
+#  to average out the variation in cnn-lstm random seed and across random subset draws. The associated
+#  experiment for pattern_scaling is called m_member_subsets_with_m50_replace_False_eval_on_all_manyr.
+
+device: 'cuda' # 'cpu'
+seed: 42
+use_deterministic_algorithms: True
+warn_only: True
+open_data_parallel: True
+
+repo_root: '/home/lutjens/climate-emulator/'
+data_root: '/d3/lutjens/bc3/data/'
+data_path: '/d3/lutjens/bc3/data/raw/CMIP6/MPI-ESM1-2-LR/' # raw data downloaded from CMIPX
+data_path_interim: '/d3/lutjens/bc3/data/interim/CMIP6/MPI-ESM1-2-LR/' # interim data, such as, statistical summaries
+data_path_climatebench: '/home/lutjens/climate-emulator-tutorial/data/raw/climatebench/' # climatebench data
+path_experiment: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr/' # root path to experiment
+path_wandb: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr/' # Store wandb logs
+path_checkpoints: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr/checkpoints' # Store model checkpoints
+path_sweep_cfg: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr/config/sweep.yaml' # Path to hyperparameter sweep config yaml. Only used if args.sweep == True
+path_eval: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr/eval_during_training' # Stores predictions and evaluation diagnostics during training; path is overwritten if sweep=True
+wandb_project_name: 'emcli-mpi-esm1-2-lr-m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr'
+dir_m_members_subsets_csv: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr/config/'
+filename_m_members_subsets_csv: 'm_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr.csv'
+path_overflow: '/net/fs06/d3/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp_manyr/' # root path to overflow storage
+
+slider: 10 # years moving temporal window 
+loss_function: 'mse' # 'mse'
+optimizer: 'rmsprop' # 'rmsprop'
+learning_rate: 0.001 # default keras rmsprop lr
+weight_decay: null
+batch_size: 16
+epochs: 2
+early_stopping_patience: 20
+
+eval_on_all_member_mean: True # If True, evaluate on the mean of all members. If False, evaluate on the mean of the selection m_member_subset
+member_mode: 'ascending-repeat' # 'equal', 'ascending', 'ascending-repeat'
+max_number_of_members_per_subset: 50
+skip_subsets: 1
+replace: False
+equal_number_of_members_in_each_subset: null
+number_of_subsets: null
+idx_member_subset: null # Idx of member subset (with m members); if given only this subset is used for training
+memberseed: 42 # Seed for creating member subsets

@@ -1,0 +1,37 @@
+# Experiment to evaluate the variation in RMSE across random subset draws (of size 1), while 
+#  averaging across the variation in the cnn-lstm due to random weight initialization seed. This 
+#  experiment nicely shows that the RMSE co-varies with realizations, i.e., if the cnn-lstm has a 
+#  low error for a given realization then the pattern scaling likely has a lower error as well. This 
+#  experiment will draw 50 random subsets that all have the same size. Then train the cnn-lstm 10 times.
+#  Matching pattern scaling experiment in pattern_scaling/mpi-esm1-2-lr/m_member_subsets_with_m1_equal/
+#  This experiment did not make it into the paper and likely does not run out-of-the-box anymore.
+
+device: 'cuda:0' # 'cpu'
+seed: 42
+n_seeds: 10
+
+repo_root: '/home/lutjens/climate-emulator/'
+data_root: '/d0/lutjens/'
+data_path: '/d0/lutjens/raw/CMIP6/MPI-ESM1-2-LR/' # raw data downloaded from CMIPX
+data_path_interim: '/d0/lutjens/interim/CMIP6/MPI-ESM1-2-LR/' # interim data, such as, statistical summaries
+data_path_climatebench: '/home/lutjens/climate-emulator-tutorial/data/raw/climatebench/' # climatebench data
+path_experiment: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m1_equal_10seeds/' # root path to experiment
+path_m_members_subsets_csv: '/home/lutjens/climate-emulator/runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m1_equal_10seeds/config/m_member_subsets_with_m1_equal_10seeds.csv'
+wandb_project_name: 'emcli-mpi-esm1-2-lr-m_member_subsets_with_m1_equal_10seeds'
+
+slider: 10 # years moving temporal window 
+loss_function: 'weighted_mse' # 'mse'
+optimizer: 'adam' # 'rmsprop'
+learning_rate: 0.001
+weight_decay: 0.1
+batch_size: 16
+epochs: 100
+early_stopping_patience: 20
+
+eval_on_all_member_mean: False
+member_mode: 'equal'
+max_number_of_members_per_subset: null
+skip_subsets: null
+replace: False
+equal_number_of_members_in_each_subset: 1
+number_of_subsets: 50
