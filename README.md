@@ -1,6 +1,6 @@
 # climate-emulator
 
-Official repository for the paper 'A cautionary tale about deep learning-based climate emulators and internal variability'. This repository compares linear pattern scaling against a CNN-LSTM for climate emulation. The models are compared on the dataset from ClimateBench and a new data summary from the MPI-ESM1.2-LR model. The repository contains all code to download data and reproduce the paper results.
+Official repository for the paper 'The impact of internal variability on benchmarking deep learning climate emulators'. This repository compares linear pattern scaling against a CNN-LSTM for climate emulation. The models are compared on the dataset from ClimateBench and a new data summary from the MPI-ESM1.2-LR model. The repository contains all code to download data and reproduce the paper results.
 
 For a tutorial on how to use pattern scaling for climate emulation, please see: 
 [climate_emulator_tutorial.ipynb](https://nbviewer.org/github/blutjens/climate-emulator-tutorial/blob/main/climate_emulator_tutorial.ipynb)
