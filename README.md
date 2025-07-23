@@ -68,7 +68,7 @@ python emcli2/models/pattern_scaling/model.py --train_m_member_subsets --cfg_pat
 python emcli2/utils/plotting.py --plot_m_member_subsets_experiment --data_var pr
 ```
 
-#### Full experiment: Train LPS and CNN-LSTM (with multiple seeds) on multiple draws of subsets with 1,2,...,50 members using SLURM. Plot RMSE over number of realizations including uncertainty bars.
+#### Full experiment: Train LPS and CNN-LSTM (with multiple seeds) on multiple draws of subsets with 1,2,...,50 members using SLURM. Plot RMSE over number of realizations including uncertainty bars. Also, reports final scores on Em-MPI 50-member dataset.
 ```
 # Send CNN-LSTM off to supercomputer
 sbatch train.sh
@@ -85,6 +85,8 @@ python emcli2/utils/plotting.py --plot_m_member_subsets_experiment --data_var pr
 ```
 # notebooks/explore_linear_relationships.ipynb -> Plot functional relationships in cumlative CO2 emissions, surface temperature, and precipitation; also plot for multiple regions
 # notebooks/explore_local_internal_variability.ipynb -> Plot internal variability in 3-member NorESM2-LM vs 50-member MPI-ESM1.2-LR ensemble-mean; also plot for multiple regions
+# notebooks/explore_pr_distribution_mpi.ipynb -> Plot precipitation distributions to show they're not log-normally distributed
+# notebooks/energy_balance.ipynb -> Plot the bias-variance tradeoff experiment on the energy balance model
 ```
 
 ### Reproduce the Em-MPI data summary from raw CMIP6 data.
