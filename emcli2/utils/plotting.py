@@ -9,6 +9,7 @@ import argparse
 import yaml
 import glob
 import pandas as pd
+import regionmask
 
 from emcli2.dataset.interim_to_processed import calculate_global_weighted_average
 
@@ -338,7 +339,6 @@ def plot_tas_annual_local_err_map(tas_true, tas_pred, data_var='tas', unit='°C'
             'ytick.labelsize':'x-large'}
     plt.rcParams.update(params)
 
-
     # Plot ground-truth surface temperature anomalies
     bounds_tas = np.hstack((np.linspace(tas_true_t_avg.min().values, -0.1, 5), np.linspace(0.1, tas_true_t_avg.max().values, 5)))
     cnorm = colors.BoundaryNorm(boundaries=bounds_tas, ncolors=256)
@@ -390,7 +390,141 @@ def plot_tas_annual_local_err_map(tas_true, tas_pred, data_var='tas', unit='°C'
         Path(filepath_to_save).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(filepath_to_save)
 
+    plt.rcParams.clear()
+    plt.rcParams.update(plt.rcParamsDefault)
+    plt.show()
+
     return axs
+    
+def plot_regional_var(tas_locals, tas_globals=None, 
+                      region_names=['Greenland/Iceland'],
+                      data_names=None, labels=None,
+                      filepath_to_save=None,
+                      tas_locals_shaded=None,
+                      preds_locals=None):
+    """
+    Plot regional interannual fluctuations
+    """
+    # Get region information from IPCC AR6 regions
+    ar6_all = regionmask.defined_regions.ar6.all
+    region = ar6_all[region_names]
+    region_idxs = list(region.regions.keys())
+
+    # Initalize figure
+    n_cols = len(tas_locals)+1
+    n_rows = len(region_idxs)
+    fig, axs = plt.subplots(n_rows, n_cols,figsize=(n_cols*3,n_rows*3), dpi=250) # , 
+    if n_cols == 1:
+        axs = axs[:,None]
+    if n_rows == 1:
+        axs = axs[None,:]
+    
+    for col_id, tas_local in enumerate(tas_locals):
+        # Create global weighted average
+        tas_local = tas_local.rename({'longitude': 'lon','latitude': 'lat'}) # regionmask assumes lat,lon keys
+        weights = np.cos(np.deg2rad(tas_local.lat))
+        if tas_globals is None:
+            tas_global = tas_local.weighted(weights).mean(dim=("lat", "lon"))
+        else:
+            tas_global = tas_globals[col_id]
+
+        # Create regional weighted average
+        mask_3D = ar6_all.mask_3D(tas_local) # mask with region information
+        tas_regional = tas_local.weighted(mask_3D * weights).mean(dim=("lat", "lon"))
+        
+        if tas_regional.time.dtype == np.dtype('datetime64[ns]'):
+            years = pd.DatetimeIndex(tas_regional.time.values).year
+            years_global = pd.DatetimeIndex(tas_global.time.values).year
+        else:
+            years = tas_regional.time
+            years_global = tas_global.time
+
+        # Process shaded regional averages        
+        if tas_locals_shaded is not None:
+            tas_local_shaded = tas_locals_shaded[col_id].rename({'longitude': 'lon','latitude': 'lat'})
+            tas_regional_shaded = tas_local_shaded.weighted(mask_3D * weights).mean(dim=("lat", "lon"))
+            if tas_regional_shaded.time.dtype == np.dtype('datetime64[ns]'):
+                years_shaded = pd.DatetimeIndex(tas_regional_shaded.time.values).year
+            else:
+                years_shaded = tas_regional_shaded.time
+        
+        # Process regional averages of model predictions
+        if preds_locals is not None:
+            preds_local = preds_locals[col_id].rename({'longitude': 'lon','latitude': 'lat'})
+            preds_regional = preds_local.weighted(mask_3D * weights).mean(dim=("lat", "lon"))
+            years_preds = pd.DatetimeIndex(preds_regional.time.values).year
+
+        for row_id, region_idx in enumerate(region_idxs):
+            main_label = f'{ar6_all[region_idx].name}'
+            if tas_locals_shaded is not None:
+                regional_tas_label = main_label
+            else:                
+                regional_tas_label = f'21-yr avg.'
+
+            # Plot regional tas
+            axs[row_id,col_id].plot(years, tas_regional.sel(region=region_idx), label=f'{ar6_all[region_idx].name}', color=labels['color'],linewidth=1.0)
+            # Plot global tas
+            axs[row_id,col_id].plot(years_global, tas_global, label='Global', color='black',linewidth=1.0)
+
+            # Plot shaded area for regional tas, e.g., for annual data
+            if tas_locals_shaded is not None:
+                axs[row_id,col_id].plot(years_shaded, tas_regional_shaded.sel(region=region_idx), label=main_label, color=labels['color'], alpha=0.3,linewidth=1.0)
+
+            # Plot model predictions
+            if preds_locals is not None:       
+                if 'memberseed' in preds_regional.dims:
+                    for memberseed in preds_regional.memberseed:
+                        axs[row_id,col_id].plot(years_preds, preds_regional.sel(region=region_idx,memberseed=memberseed), label=labels['model_key'], color='tab:orange', linestyle='--', linewidth=1.0)
+                else:
+                    axs[row_id,col_id].plot(years_preds, preds_regional.sel(region=region_idx), label=labels['model_key'], color='tab:orange', linestyle='--', linewidth=1.0)                
+
+            #if row_id > 0: # Disable y-axis ticks
+            #    axs[row_id].get_yaxis().set_visible(False)
+            if row_id == 0 and data_names is not None:
+                axs[row_id,col_id].set_title(f'{data_names[col_id]}')
+            if row_id == len(region_idxs)-1:
+                axs[row_id,col_id].set_xlabel("Time in years")
+            if col_id == 0:
+                if labels is not None:
+                    axs[row_id,col_id].set_ylabel(labels['ylabel'])
+                else:
+                    axs[row_id,col_id].set_ylabel("Surface temperature anom. \n wrt. piControl in °C")
+            if col_id == labels['legend_col_id']:
+                axs[row_id,col_id].legend()
+            axs[row_id,col_id].set_ylim(labels['ylim'])
+
+    # Indicate region by plotting map with region highlighted
+    for row_id, region_idx in enumerate(region_idxs):
+        mask = ar6_all.mask(tas_local)
+        tas_regional_tst = tas_local.where(mask.cf == ar6_all[region_idx].abbrev)
+        tas_regional_tst = tas_regional_tst.sel(time = slice('2080', '2100')).mean(dim='time',keep_attrs=True)
+        tas_regional_tst = tas_regional_tst.where(tas_regional_tst.isnull(), 1., 0.)
+
+        # choose a projection
+        proj = ccrs.Robinson()
+        last_ax = plt.subplot2grid((n_rows,n_cols), (row_id,2), projection=proj)
+        #last_ax = plt.subplot(int(f'{n_rows}{n_cols}{n_cols*(row_id+1)}'), projection=proj)
+        #ax = plt.subplot(111, projection=proj)
+        last_ax.set_global()
+
+        tas_regional_tst.plot.pcolormesh(
+            ax=last_ax, x="lon", y="lat", 
+            transform=ccrs.PlateCarree(),
+            add_colorbar=False,
+            cmap=labels['cmap']
+        )
+        last_ax.set_title(f'{ar6_all[region_idx].name}')
+        last_ax.coastlines(linewidth=0.2);
+    
+    # fig.suptitle(f'{labels["title"]}, ssp245', y=1.)
+    
+    plt.tight_layout()
+    if filepath_to_save is not None:
+        Path(filepath_to_save).parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(filepath_to_save)
+
+    plt.show()
+    plt.close()
 
 def plot_histogram(hist, bin_values, 
         xlabel="Annual Mean Local Surface Temp. Anomaly, tas, in K",
@@ -492,6 +626,12 @@ def plot_m_member_subsets_experiment(data_var='pr',
             because difference plot shows all sample realizations using small green dots.
     """
     print(f'Starting to analyse {metric}({data_var})')
+    metric_labels = {'Y_rmse_spatial_tex': r'RMSE$_s$', 
+                'Y_rmse_spatial_text': 'Spatial RMSE', 
+                'Y_rmse_global_np_tex': r'RMSE$_g$',
+                'Y_rmse_global_np_text': 'Global RMSE',
+                }
+
     filepath_to_save = f'docs/figures/mpi-esm1-2-lr/{data_var}/{experiment_keys["cnn_lstm"]}/{metric}.png'
     # Deprecated paths for:
     # paths_experiment = [f'runs/cnn_lstm/mpi-esm1-2-lr/m_member_subsets_with_m50_eval_on_all_spcmp_dwp/{data_var}/member_subset*/sweep/task-*/incumbents/incumbents.yaml', 
@@ -508,26 +648,11 @@ def plot_m_member_subsets_experiment(data_var='pr',
             paths_experiment.append(f'runs/pattern_scaling/mpi-esm1-2-lr/{experiment_keys["pattern_scaling"]}/{data_var}/memberseed-*/incumbents/incumbents.yaml')
         else:
             raise ValueError(f'Unknown model key {model_key}.')
-
-    metric_labels = {'Y_rmse_spatial_tex': r'RMSE$_s$', 
-                    'Y_rmse_spatial_text': 'Spatial RMSE', 
-                    'Y_rmse_global_np_tex': r'RMSE$_g$',
-                    'Y_rmse_global_np_text': 'Global RMSE',
-                    }
     
     # Iterate over every model
-    lens = dict()
-    metric_value = dict()
-    idcs_member_id = dict()
     entries = []
     for model_key, path_experiment in zip(model_keys, paths_experiment):
-        idcs_member_id[model_key] = dict()
-        lens[model_key] = dict()
-        metric_value[model_key] = dict()
-        idcs_member_id[model_key] = dict()
-
         paths_incumbents = glob.glob(path_experiment)
-
         for path_incumbents in paths_incumbents:
             inc = yaml.safe_load(open(path_incumbents, 'r'))
             for idx_member_subset in inc.keys():

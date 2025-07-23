@@ -19,7 +19,6 @@ from emcli2.dataset.climatebench import normalize
 from emcli2.dataset.climatebench import load_climatebench_inputs_as_np_time_series
 from emcli2.dataset.climatebench import unnormalize
 
-from emcli2.dataset.climatebench import output_for_training
 def convert_xr_to_np_timeseries(data_var, slider=10,
                                 Y_train=None, scenarios_train=[], 
                                 Y_test=None, scenarios_test=[], 
@@ -113,7 +112,7 @@ def load_mpi_data_as_xr(df, meta, climatology=None, m_member_subset=None, verbos
         if len(df_scenario.filepath.values.tolist()) == 1:
             dataset_xr = xr.open_dataset(df_scenario.filepath.values.tolist()[0])
         else:
-            dataset_xr = xr.open_mfdataset(df_scenario.filepath.values.tolist())
+            dataset_xr = xr.open_mfdataset(df_scenario.filepath.values.tolist(), combine='nested', concat_dim='time')
 
         # Optionally, compute mean over m-member subset
         if m_member_subset is not None:

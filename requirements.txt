@@ -30,5 +30,5 @@ keras # 3.4.0; for training cnn-lstm
 wandb # 0.17.3; for logging experiments
 huggingface_hub # 0.23.4; for downloading dataset
 tensorflow # 2.16.1; Some components related Keras 3.0 with torch backend still rely on tf (here wandblogger and Dataset() class). Todo: remove this requirement after wandb and keras update.
-
+ray # for parallel processing on cpu
 

@@ -157,7 +157,8 @@ def load_climatebench_inputs_as_np_time_series(scenarios,
                                   split='train',
                                   slider=10,
                                   normalize=True,
-                                  verbose=True):
+                                  verbose=True,
+                                  skip_historical_in_test=True):
     """
     Load Climatebench data and returns it as np.ndarray time-series 
 
@@ -185,7 +186,7 @@ def load_climatebench_inputs_as_np_time_series(scenarios,
     if split == 'train':
         X_all = np.concatenate([input_for_training(X_norm[i], slider=slider) for i in range(len(scenarios))], axis = 0)
     elif split == 'val' or split == 'test':
-        X_all = input_for_training(X_norm[0], skip_historical=True, len_historical=165, slider=slider)
+        X_all = input_for_training(X_norm[0], skip_historical=skip_historical_in_test, len_historical=165, slider=slider)
     # Close data
     for data in X_norm:
         data.close(); del data
