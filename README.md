@@ -134,12 +134,13 @@ python emcli2/dataset/mpi_esm1_2_lr.py --data_var 'tas' --get_ensemble_concat
 ### Reference
 If this repository is useful for your analysis please consider citing:
 ```
-@article{lutjens24internalvar,
+@article{lutjens25internalvar,
       title={The impact of internal variability on benchmarking deep learning climate emulators}, 
       author={Björn Lütjens and Raffaele Ferrari and Duncan Watson-Parris and Noelle Selin},
-      year={2024},
-      eprint={2408.05288},
-      archivePrefix={arXiv},
-      url={https://arxiv.org/abs/2408.05288}, 
+      year={2025},
+      journal = {Journal of Advances in Modeling Earth Systems},
+      volume = {17},
+      number = {8},
+      url={https://doi.org/10.1029/2024MS004619}, 
 }
 ```
